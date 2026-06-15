@@ -1,10 +1,15 @@
+import config from "../../Config";
 import { pool } from "../../DB/server";
+import jwt, { type JwtPayload } from "jsonwebtoken"
 
 
-const createIssuesFromDB = async (payload: any) => {
+
+
+const createIssuesFromDB = async (payload: any, token : string) => {
     console.log(payload)
     const { title, description, type } = payload;
-    const reporter_id = 1
+    const decode = jwt.verify(token as string, config.secret_key as string) as JwtPayload
+    const reporter_id = decode.id
     const issues = await pool.query(`
     INSERT INTO issues(title, description, type, reporter_id) VALUES($1, $2, $3, $4)
     RETURNING *

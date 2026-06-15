@@ -3,7 +3,8 @@ import { issuesService } from "./issues.service"
 
 const createIssues = async (req: Request, res: Response) => {
     try {
-        const result = await issuesService.createIssuesFromDB(req.body)
+        const token = req.headers.authorization
+        const result = await issuesService.createIssuesFromDB(req.body, token as string)
         res.status(201).json({
             success: true,
             message: "Issue created successfully",
