@@ -57,7 +57,6 @@ const authUpdate = (...role: roleType[]) => {
             }
             const decode = jwt.verify(token as string, config.secret_key as string) as JwtPayload
             const issueId = req.params.id;
-            console.log(decode)
             const userData = await pool.query(`
         SELECT * FROM users WHERE id = $1    
             `, [issueId])
@@ -73,8 +72,6 @@ const authUpdate = (...role: roleType[]) => {
                 req.user = decode;
                 return next();
             }
-
-
             if (decode.role === 'contributor') {
 
                 if (user.reporter_id === decode.id && user.status === 'open') {
@@ -102,18 +99,16 @@ const authDeleteIssues = (...role: roleType[]) => {
                 })
             }
             const decode = jwt.verify(token as string, config.secret_key as string) as JwtPayload
-
-
             if (role.includes(decode.role)) {
                 req.user = decode;
                 return next()
             }
             res.status(401).json({
-                    success: false,
-                    message: "Un Authorize Access",
-                    data: {}
-                })
-     
+                success: false,
+                message: "Un Authorize Access",
+                data: {}
+            })
+
         } catch (error) {
             next(error)
         }

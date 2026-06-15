@@ -3,7 +3,9 @@ import { pool } from "../../DB/server";
 import jwt, { type JwtPayload } from "jsonwebtoken"
 
 
-
+interface createIssuesFromDBType {
+    
+}
 
 const createIssuesFromDB = async (payload: any, token : string) => {
     console.log(payload)

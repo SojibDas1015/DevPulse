@@ -1,19 +1,22 @@
 import type { Request, Response } from "express"
 import { authService } from "./auth.service"
+import sendResponse from "../../utility/sendresponse"
 
 const userSignUp = async (req: Request, res: Response) => {
     try {
         const result = await authService.userCreateFromDB(req.body)
-        res.status(201).json({
+        sendResponse(res, {
+            statusCode: 201,
             success: true,
             message: "User registered successfully",
             data: result.rows[0]
         })
     } catch (error: any) {
-        res.status(500).json({
+        sendResponse(res, {
+            statusCode: 500,
             success: false,
             message: error.message,
-            errors: error
+            error: error
         })
     }
 }
@@ -21,7 +24,8 @@ const userSignUp = async (req: Request, res: Response) => {
 const userLogin = async (req: Request, res: Response) => {
     try {
         const {accessToken, userData} = await authService.userLoginFromDB(req.body)
-        res.status(201).json({
+        sendResponse(res, {
+            statusCode: 201,
             success: true,
             message: "Login successful",
             token : accessToken,
@@ -29,7 +33,8 @@ const userLogin = async (req: Request, res: Response) => {
         })
 
     } catch (error: any) {
-        res.status(500).json({
+        sendResponse(res, {
+            statusCode: 500,
             success: false,
             message: error.message,
             errors: error
