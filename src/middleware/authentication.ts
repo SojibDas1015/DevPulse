@@ -14,7 +14,7 @@ const createIssues = (...role: roleType[]) => {
                 sendResponse(res, {
                     statusCode: 401,
                     success: false,
-                    message: "Unauthorize",
+                    message: "Unauthorized",
                 })
             }
             const decode = jwt.verify(token as string, config.secret_key as string) as JwtPayload
@@ -48,7 +48,7 @@ const authUpdate = (...role: roleType[]) => {
                 sendResponse(res, {
                     statusCode: 401,
                     success: false,
-                    message: "Unauthorize",
+                    message: "Unauthorized",
                 })
             }
             const decode = jwt.verify(token as string, config.secret_key as string) as JwtPayload
@@ -60,30 +60,26 @@ const authUpdate = (...role: roleType[]) => {
             const user = userData.rows[0]
             if (userData.rowCount === 0) {
                 return sendResponse(res, {
-                    statusCode: 401,
+                    statusCode: 404,
                     success: false,
-                    message: "user not found",
-                    data: {}
+                    message: "Not Found",
                 })
             }
-
             if (decode.role === 'maintainer') {
                 req.user = decode;
                 return next();
             }
 
             if (decode.role === 'contributor') {
-                console.log(role)
                 if (user.reporter_id === decode.id && user.status === 'open') {
                     req.user = decode;
                     next()
                 }
                 else {
                     sendResponse(res, {
-                        statusCode: 401,
+                        statusCode: 400,
                         success: false,
-                        message: "not own role and open status",
-                        data: {}
+                        message: "Not own issue and Status open",
                     })
                 }
 
@@ -103,8 +99,7 @@ const authDeleteIssues = (...role: roleType[]) => {
                 sendResponse(res, {
                     statusCode: 401,
                     success: false,
-                    message: "Un Authorize Access",
-                    data: {}
+                    message: "Unauthorized",
                 })
             }
             const decode = jwt.verify(token as string, config.secret_key as string) as JwtPayload
@@ -113,10 +108,9 @@ const authDeleteIssues = (...role: roleType[]) => {
                 return next()
             }
             sendResponse(res, {
-                statusCode: 401,
+                statusCode: 403,
                 success: false,
-                message: "Un Authorize Access",
-                data: {}
+                message: "Forbidden",
             })
         } catch (error) {
             next(error)
