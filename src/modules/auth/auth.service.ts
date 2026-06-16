@@ -25,7 +25,7 @@ const userLoginFromDB = async (payload: any) => {
     if(user.rowCount === 0){
         throw new Error("Email Not Found")
     }
-    const compare = bcrypt.compare(password, userData.password)
+    const compare = await bcrypt.compare(password, userData.password)
     if(!compare){
         throw new Error("Invalid Password")
     }
