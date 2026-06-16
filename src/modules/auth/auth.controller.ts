@@ -25,7 +25,7 @@ const userLogin = async (req: Request, res: Response) => {
     try {
         const {accessToken, userData} = await authService.userLoginFromDB(req.body)
         sendResponse(res, {
-            statusCode: 201,
+            statusCode: 200,
             success: true,
             message: "Login successful",
             token : accessToken,

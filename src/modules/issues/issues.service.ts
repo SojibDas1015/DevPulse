@@ -7,6 +7,12 @@ import jwt, { type JwtPayload } from "jsonwebtoken"
 
 const createIssuesFromDB = async (payload: any, token: string) => {
     const { title, description, type } = payload;
+    if (description.length <= 20) {
+        throw new Error("Description Minimum 20 Characters")
+    }
+    else if (title.length >= 151) {
+        throw new Error("Title Maximum 150 Characters")
+    }
     const decode = jwt.verify(token as string, config.secret_key as string) as JwtPayload
     const reporter_id = decode.id
     const issues = await pool.query(`
@@ -30,12 +36,18 @@ const getAllFromDB = async (payload: any) => {
             const issues = await pool.query(`
     SELECT * FROM issues ORDER BY create_at ASC
         `)
+            if (issues.rowCount === 0) {
+                throw new Error(`${sort} Data Not Found`)
+            }
             return issues
         }
         else if (sort === "oldest") {
             const issues = await pool.query(`
     SELECT * FROM issues ORDER BY create_at DESC
         `)
+            if (issues.rowCount === 0) {
+                throw new Error(`${sort} Data Not Found`)
+            }
             return issues
         }
     }
@@ -44,12 +56,18 @@ const getAllFromDB = async (payload: any) => {
             const issues = await pool.query(`
     SELECT * FROM issues WHERE type = $1
         `, [type])
+            if (issues.rowCount === 0) {
+                throw new Error(`${type} Data Not Found`)
+            }
             return issues
         }
         else if (type === "feature_request") {
             const issues = await pool.query(`
     SELECT * FROM issues WHERE type = $1
         `, [type])
+            if (issues.rowCount === 0) {
+                throw new Error(`${type} Data Not Found`)
+            }
             return issues
         }
     }
@@ -58,18 +76,27 @@ const getAllFromDB = async (payload: any) => {
             const issues = await pool.query(`
     SELECT * FROM issues WHERE status = $1
         `, [status])
+            if (issues.rowCount === 0) {
+                throw new Error(`${status} Data Not Found`)
+            }
             return issues
         }
         else if (status === "in_progress") {
             const issues = await pool.query(`
     SELECT * FROM issues WHERE status = $1
         `, [status])
+            if (issues.rowCount === 0) {
+                throw new Error(`${status} Data Not Found`)
+            }
             return issues
         }
         else if (status === "resolved") {
             const issues = await pool.query(`
     SELECT * FROM issues WHERE status = $1
         `, [status])
+            if (issues.rowCount === 0) {
+                throw new Error(`${status} Data Not Found`)
+            }
             return issues
         }
     }
@@ -80,10 +107,16 @@ const getSingleIssuesFromDB = async (id: any) => {
     const issues = await pool.query(`
     SELECT * FROM issues WHERE id=$1    
         `, [id])
+    if (issues.rowCount === 0) {
+        throw new Error("Issues Not Found")
+    }
     const reporter_info = issues.rows[0]
     const reporter_details = await pool.query(`
         SELECT * FROM users WHERE id = $1
         `, [reporter_info.reporter_id])
+    if (reporter_details.rowCount === 0) {
+        throw new Error("Reporter Not Found")
+    }
     const reporterRes = reporter_details.rows[0]
     const report = {
         id: reporterRes.id,
@@ -108,9 +141,12 @@ const updateIssueFromDB = async (payload: any, id: string) => {
 }
 
 const issuesDeleteFromDB = async (id: string) => {
-    const issues = pool.query(`
+    const issues = await pool.query(`
     DELETE FROM issues WHERE id = $1
         `, [id])
+        if(issues.rowCount === 0){
+            throw new Error("Issue Already Delete")
+        }
     return issues
 }
 

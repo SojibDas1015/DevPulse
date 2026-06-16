@@ -27,7 +27,7 @@ const getAllIssues = async (req: Request, res: Response) => {
     try {
         const result = await issuesService.getAllFromDB(req.query)
         sendResponse(res, {
-            statusCode: 201,
+            statusCode: 200,
             success: true,
             message: "Issues retrived successfully",
             data: result?.rows
@@ -69,7 +69,7 @@ const updateIssue = async (req: Request, res: Response) => {
         const { id } = req.params
         const result = await issuesService.updateIssueFromDB(req.body, id as string)
         sendResponse(res, {
-            statusCode: 201,
+            statusCode: 200,
             success: true,
             message: "Issue updated successfully",
             data: result.rows[0]

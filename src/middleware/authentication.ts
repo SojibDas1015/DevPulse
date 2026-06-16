@@ -21,10 +21,15 @@ const createIssues = (...role: roleType[]) => {
             const userData = await pool.query(`
             SELECT * FROM users WHERE role = $1    
             `, [decode.role])
-
+            if (userData.rowCount === 0) {
+                return sendResponse(res, {
+                    statusCode: 404,
+                    success: false,
+                    message: "Not Found",
+                })
+            }
             const user = userData.rows[0]
-
-            if (role.length && !role.includes(user.role)) {
+            if (role.length && role.includes(user.role)) {
                 next()
             }
             else {
@@ -79,7 +84,7 @@ const authUpdate = (...role: roleType[]) => {
                     sendResponse(res, {
                         statusCode: 400,
                         success: false,
-                        message: "Not own issue and Status open",
+                        message: "Not Own issue or Status Not open",
                     })
                 }
 
