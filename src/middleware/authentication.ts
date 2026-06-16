@@ -3,6 +3,7 @@ import type { roleType } from "../role"
 import jwt, { type JwtPayload } from "jsonwebtoken"
 import config from "../Config"
 import { pool } from "../DB/server"
+import sendResponse from "../utility/sendresponse"
 
 
 const createIssues = (...role: roleType[]) => {
@@ -10,76 +11,83 @@ const createIssues = (...role: roleType[]) => {
         try {
             const token = req.headers.authorization
             if (!token) {
-                res.status(401).json({
+                sendResponse(res, {
+                    statusCode: 401,
                     success: false,
-                    message: "Un Authorize Access",
-                    data: {}
+                    message: "Unauthorize",
                 })
             }
             const decode = jwt.verify(token as string, config.secret_key as string) as JwtPayload
-            console.log(decode)
             const userData = await pool.query(`
-        SELECT * FROM users WHERE role = $1    
+            SELECT * FROM users WHERE role = $1    
             `, [decode.role])
+
             const user = userData.rows[0]
-            if (userData.rowCount === 0) {
-                res.status(404).json({
-                    success: false,
-                    message: "user not found",
-                    data: {}
-                })
-            }
+
             if (role.length && !role.includes(user.role)) {
-                res.status(403).json({
+                next()
+            }
+            else {
+                sendResponse(res, {
+                    statusCode: 403,
                     success: false,
-                    message: "forbidden not access able ",
-                    data: {}
+                    message: "Forbidden",
                 })
             }
-            next()
         } catch (error) {
             next(error)
         }
     }
 }
 
-
 const authUpdate = (...role: roleType[]) => {
     return async (req: Request, res: Response, next: NextFunction) => {
         try {
             const token = req.headers.authorization
             if (!token) {
-                res.status(401).json({
+                sendResponse(res, {
+                    statusCode: 401,
                     success: false,
-                    message: "Un Authorize Access",
-                    data: {}
+                    message: "Unauthorize",
                 })
             }
             const decode = jwt.verify(token as string, config.secret_key as string) as JwtPayload
             const issueId = req.params.id;
             const userData = await pool.query(`
-        SELECT * FROM users WHERE id = $1    
+               SELECT * FROM issues WHERE id = $1    
             `, [issueId])
+
             const user = userData.rows[0]
             if (userData.rowCount === 0) {
-                res.status(404).json({
+                return sendResponse(res, {
+                    statusCode: 401,
                     success: false,
                     message: "user not found",
                     data: {}
                 })
             }
+
             if (decode.role === 'maintainer') {
                 req.user = decode;
                 return next();
             }
-            if (decode.role === 'contributor') {
 
+            if (decode.role === 'contributor') {
+                console.log(role)
                 if (user.reporter_id === decode.id && user.status === 'open') {
                     req.user = decode;
+                    next()
+                }
+                else {
+                    sendResponse(res, {
+                        statusCode: 401,
+                        success: false,
+                        message: "not own role and open status",
+                        data: {}
+                    })
                 }
 
             }
-            next()
         } catch (error) {
             next(error)
         }
@@ -92,7 +100,8 @@ const authDeleteIssues = (...role: roleType[]) => {
         try {
             const token = req.headers.authorization
             if (!token) {
-                res.status(401).json({
+                sendResponse(res, {
+                    statusCode: 401,
                     success: false,
                     message: "Un Authorize Access",
                     data: {}
@@ -103,12 +112,12 @@ const authDeleteIssues = (...role: roleType[]) => {
                 req.user = decode;
                 return next()
             }
-            res.status(401).json({
+            sendResponse(res, {
+                statusCode: 401,
                 success: false,
                 message: "Un Authorize Access",
                 data: {}
             })
-
         } catch (error) {
             next(error)
         }

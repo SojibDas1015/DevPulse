@@ -6,18 +6,17 @@ import config from "../../Config"
 const userCreateFromDB = async (payload: any) => {
     const { name, email, password, role } = payload
     const passwordHash = await bcrypt.hash(password, 10);
-    console.log(passwordHash)
+
     const result = await pool.query(`
     INSERT INTO users(name, email, password, role) VALUES($1, $2, $3, COALESCE($4, 'contributor'))
     RETURNING *
         `, [name, email, passwordHash, role])
-    console.log(result)
     delete result.rows[0].password
     return result
 }
 
 const userLoginFromDB = async (payload: any) => {
-    // 1console.log(payload)
+
     const { email, password } = payload;
     const user = await pool.query(`
     SELECT * FROM users WHERE email = $1
@@ -40,7 +39,6 @@ const userLoginFromDB = async (payload: any) => {
     const accessToken = jwt.sign(jwtPayload, config.secret_key as string, {expiresIn : "2d"})
     delete userData.password
     return {accessToken, userData}
-    // console.log(user.rows[0])
 
 }
 

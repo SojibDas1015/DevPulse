@@ -48,7 +48,7 @@ const getSingleIssues = async (req: Request, res: Response) => {
     try {
         const { id } = req.params
         const result = await issuesService.getSingleIssuesFromDB(id)
-         sendResponse(res, {
+        sendResponse(res, {
             statusCode: 201,
             success: true,
             message: "Issues retrived successfully",
@@ -88,7 +88,6 @@ const updateIssue = async (req: Request, res: Response) => {
 const issuesDelete = async (req: Request, res: Response) => {
     try {
         const { id } = req.params
-        console.log(id)
         const result = await issuesService.issuesDeleteFromDB(id as string)
         sendResponse(res, {
             statusCode: 200,

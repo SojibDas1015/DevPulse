@@ -1,12 +1,14 @@
 import { type Response } from "express";
 
-const sendResponse = (res: Response, data: any) => {
-    const { status, success, message, resData , error } = data
-    res.status(status).json({
+const sendResponse = (res: Response, payload: any) => {
+    const { statusCode, success, message, data, error, user, token } = payload
+    res.status(statusCode).json({
         success: success,
         message: message,
-        data: resData,
-        error : error
+        token: token,
+        user: user,
+        data: data,
+        error: error
     })
 }
 
