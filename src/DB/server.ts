@@ -35,5 +35,5 @@ export const initDb = async()=>{
 
     )    
         `);
-    console.log("Neon DB is Connected")
+    console.log("Database Connected Successfully")
 }
