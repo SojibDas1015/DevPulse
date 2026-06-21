@@ -2,8 +2,9 @@ import { pool } from "../../DB/server"
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import config from "../../Config"
+import type { IUserLogin, IUserSignUp } from "../../utility/type"
 
-const userCreateFromDB = async (payload: any) => {
+const userCreateFromDB = async (payload: IUserSignUp) => {
     const { name, email, password, role } = payload
     const passwordHash = await bcrypt.hash(password, 10);
 
@@ -15,7 +16,7 @@ const userCreateFromDB = async (payload: any) => {
     return result
 }
 
-const userLoginFromDB = async (payload: any) => {
+const userLoginFromDB = async (payload: IUserLogin) => {
 
     const { email, password } = payload;
     const user = await pool.query(`

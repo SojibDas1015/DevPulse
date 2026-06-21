@@ -1,11 +1,12 @@
 import config from "../../Config";
 import { pool } from "../../DB/server";
 import jwt, { type JwtPayload } from "jsonwebtoken"
+import type { IUserGetAllIssues, IUserIssues } from "../../utility/type";
 
 
 
 
-const createIssuesFromDB = async (payload: any, token: string) => {
+const createIssuesFromDB = async (payload: IUserIssues, token: string) => {
     const { title, description, type } = payload;
     if (description.length <= 20) {
         throw new Error("Description Minimum 20 Characters")
@@ -23,7 +24,7 @@ const createIssuesFromDB = async (payload: any, token: string) => {
 
 }
 
-const getAllFromDB = async (payload: any) => {
+const getAllFromDB = async (payload: IUserGetAllIssues) => {
     const { sort, type, status } = payload
     if (!sort && !type && !status) {
         const issues = await pool.query(`
@@ -103,7 +104,7 @@ const getAllFromDB = async (payload: any) => {
 
 }
 
-const getSingleIssuesFromDB = async (id: any) => {
+const getSingleIssuesFromDB = async (id: string) => {
     const issues = await pool.query(`
     SELECT * FROM issues WHERE id=$1    
         `, [id])
@@ -130,7 +131,7 @@ const getSingleIssuesFromDB = async (id: any) => {
     return issues
 }
 
-const updateIssueFromDB = async (payload: any, id: string) => {
+const updateIssueFromDB = async (payload: IUserIssues, id: string) => {
     const { title, description, type } = payload;
     const issues = await pool.query(`
     UPDATE issues SET title = COALESCE($1, title), description = COALESCE($2, description), type = COALESCE($3, type) WHERE id=$4

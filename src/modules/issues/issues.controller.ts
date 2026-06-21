@@ -13,11 +13,11 @@ const createIssues = async (req: Request, res: Response) => {
             data: result.rows[0]
         })
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         sendResponse(res, {
             statusCode: 500,
             success: false,
-            message: error.message,
+            message: (error as Error).message,
             error: error
         })
     }
@@ -33,11 +33,11 @@ const getAllIssues = async (req: Request, res: Response) => {
             data: result?.rows
         })
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         sendResponse(res, {
             statusCode: 500,
             success: false,
-            message: error.message,
+            message: (error as Error).message,
             error: error
         })
     }
@@ -47,18 +47,18 @@ const getAllIssues = async (req: Request, res: Response) => {
 const getSingleIssues = async (req: Request, res: Response) => {
     try {
         const { id } = req.params
-        const result = await issuesService.getSingleIssuesFromDB(id)
+        const result = await issuesService.getSingleIssuesFromDB(id as string)
         sendResponse(res, {
             statusCode: 201,
             success: true,
             message: "Issues retrived successfully",
             data: result.rows[0]
         })
-    } catch (error: any) {
+    } catch (error: unknown) {
         sendResponse(res, {
             statusCode: 500,
             success: false,
-            message: error.message,
+            message: (error as Error).message,
             error: error
         })
     }
@@ -74,11 +74,11 @@ const updateIssue = async (req: Request, res: Response) => {
             message: "Issue updated successfully",
             data: result.rows[0]
         })
-    } catch (error: any) {
+    } catch (error: unknown) {
         sendResponse(res, {
             statusCode: 500,
             success: false,
-            message: error.message,
+            message: (error as Error).message,
             error: error
         })
     }
@@ -94,11 +94,11 @@ const issuesDelete = async (req: Request, res: Response) => {
             success: true,
             message: "Issue deleted successfully",
         })
-    } catch (error: any) {
+    } catch (error: unknown) {
         sendResponse(res, {
             statusCode: 500,
             success: false,
-            message: error.message,
+            message: (error as Error).message,
             error: error
         })
     }

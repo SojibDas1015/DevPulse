@@ -11,11 +11,11 @@ const userSignUp = async (req: Request, res: Response) => {
             message: "User registered successfully",
             data: result.rows[0]
         })
-    } catch (error: any) {
+    } catch (error: unknown) {
         sendResponse(res, {
             statusCode: 500,
             success: false,
-            message: error.message,
+            message: (error as Error).message,
             error: error
         })
     }
@@ -32,11 +32,11 @@ const userLogin = async (req: Request, res: Response) => {
             user: userData
         })
 
-    } catch (error: any) {
+    } catch (error:  unknown) {
         sendResponse(res, {
             statusCode: 500,
             success: false,
-            message: error.message,
+            message: (error as Error).message,
             errors: error
         })
     }
